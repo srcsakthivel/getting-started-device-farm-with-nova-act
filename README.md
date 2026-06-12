@@ -1,93 +1,185 @@
-# getting-started-device-farm-with-nova-act
+# Getting Started: Amazon Nova Act + AWS Device Farm (Mobile Testing)
 
-
-
-## Getting started
-
-To make it easy for you to get started with GitLab, here's a list of recommended next steps.
-
-Already a pro? Just edit this README.md and make it your own. Want to make it easy? [Use the template at the bottom](#editing-this-readme)!
-
-## Add your files
-
-- [ ] [Create](https://docs.gitlab.com/ee/user/project/repository/web_editor.html#create-a-file) or [upload](https://docs.gitlab.com/ee/user/project/repository/web_editor.html#upload-a-file) files
-- [ ] [Add files using the command line](https://docs.gitlab.com/topics/git/add_files/#add-files-to-a-git-repository) or push an existing Git repository with the following command:
+A minimal, standalone sample showing how to run **Amazon Nova Act** tests on **real mobile devices** via **AWS Device Farm** — define test actions in plain English, and Nova Act drives the device visually.
 
 ```
-cd existing_repo
-git remote add origin https://gitlab.aws.dev/banana-box/getting-started-device-farm-with-nova-act.git
-git branch -M main
-git push -uf origin main
+You (natural language) → Nova Act (visual AI) → Appium → Device Farm (real device)
 ```
 
-## Integrate with your tools
+## What This Does
 
-- [ ] [Set up project integrations](https://gitlab.aws.dev/banana-box/getting-started-device-farm-with-nova-act/-/settings/integrations)
+Nova Act's visual AI model drives real Android/iOS devices on AWS Device Farm. You define test actions in plain English, and Nova Act taps, swipes, and verifies the UI visually — no selectors, no Appium scripts to maintain.
 
-## Collaborate with your team
+## Project Structure
 
-- [ ] [Invite team members and collaborators](https://docs.gitlab.com/ee/user/project/members/)
-- [ ] [Create a new merge request](https://docs.gitlab.com/ee/user/project/merge_requests/creating_merge_requests.html)
-- [ ] [Automatically close issues from merge requests](https://docs.gitlab.com/ee/user/project/issues/managing_issues.html#closing-issues-automatically)
-- [ ] [Enable merge request approvals](https://docs.gitlab.com/ee/user/project/merge_requests/approvals/)
-- [ ] [Set auto-merge](https://docs.gitlab.com/user/project/merge_requests/auto_merge/)
+```
+getting-started-device-farm-with-nova-act/
+├── README.md
+├── pyproject.toml
+├── requirements.txt
+├── uv.lock
+├── apps/
+│   └── AWSDeviceFarmAndroidReferenceApp.apk  # Reference app for testing
+├── screenshots/                           # Test output screenshots
+│   ├── battery_screenshot.png
+│   ├── display_screenshot.png
+│   ├── traditional_battery_screenshot.png
+│   └── traditional_display_screenshot.png
+└── src/
+    ├── android_getting_started.py         # Android quick start (Settings app)
+    ├── ios_getting_started.py             # iOS quick start (Settings app)
+    ├── android_custom_app.py              # Reference App tests (Login, Alerts, Fixtures)
+    ├── custom_app_getting_started.py      # Custom app with upload (generic template)
+    ├── android_traditional_appium.py      # Traditional Appium comparison (shows fragility)
+    └── nova_act_mobile/                   # Vendored mobile helper library
+        ├── ATTRIBUTION.md
+        └── ...
+```
 
-## Test and Deploy
+## Prerequisites
 
-Use the built-in continuous integration in GitLab.
+1. **Python 3.11+**
+2. **AWS Account** with Device Farm access (us-west-2)
+3. **AWS CLI** configured with credentials that have `devicefarm:*` permissions
 
-- [ ] [Get started with GitLab CI/CD](https://docs.gitlab.com/ee/ci/quick_start/)
-- [ ] [Analyze your code for known vulnerabilities with Static Application Security Testing (SAST)](https://docs.gitlab.com/ee/user/application_security/sast/)
-- [ ] [Deploy to Kubernetes, Amazon EC2, or Amazon ECS using Auto Deploy](https://docs.gitlab.com/ee/topics/autodevops/requirements.html)
-- [ ] [Use pull-based deployments for improved Kubernetes management](https://docs.gitlab.com/ee/user/clusters/agent/)
-- [ ] [Set up protected environments](https://docs.gitlab.com/ee/ci/environments/protected_environments.html)
+## Setup
 
-***
+```bash
+# Clone this repo
+git clone <repo-url>
+cd getting-started-device-farm-with-nova-act
 
-# Editing this README
+# Install dependencies
+pip install -r requirements.txt
+# OR with uv:
+uv sync
 
-When you're ready to make this README your own, just edit this file and use the handy template below (or feel free to structure it however you want - this is just a starting point!). Thanks to [makeareadme.com](https://www.makeareadme.com/) for this template.
+# Configure environment
+cp .env.example .env
+# Edit .env with your workflow definition name and device ARN
+```
 
-## Suggestions for a good README
+## Authentication
 
-Every project is different, so consider which of these sections apply to yours. The sections used in the template are suggestions for most open source projects. Also keep in mind that while a README can be too long and detailed, too long is better than too short. If you think your README is too long, consider utilizing another form of documentation rather than cutting out information.
+| Method | How | When |
+|--------|-----|------|
+| **Workflow Definition** (recommended) | `workflow_definition_name="device-farm-sample"` in code | Production, CI/CD, team usage |
+| **API Key** (quick start) | `export NOVA_ACT_API_KEY=...` | Local development |
 
-## Name
-Choose a self-explaining name for your project.
+## Run
 
-## Description
-Let people know what your project can do specifically. Provide context and add a link to any reference visitors might be unfamiliar with. A list of Features or a Background subsection can also be added here. If there are alternatives to your project, this is a good place to list differentiating factors.
+All scripts are in the `src/` directory:
 
-## Badges
-On some READMEs, you may see small images that convey metadata, such as whether or not all the tests are passing for the project. You can use Shields to add some to your README. Many services also have instructions for adding a badge.
+```bash
+cd src/
+```
 
-## Visuals
-Depending on what you are making, it can be a good idea to include screenshots or even a video (you'll frequently see GIFs rather than actual videos). Tools like ttygif can help, but check out Asciinema for a more sophisticated method.
+### Android — Settings App (no app upload needed)
+```bash
+python android_getting_started.py
+```
 
-## Installation
-Within a particular ecosystem, there may be a common way of installing things, such as using Yarn, NuGet, or Homebrew. However, consider the possibility that whoever is reading your README is a novice and would like more guidance. Listing specific steps helps remove ambiguity and gets people to using your project as quickly as possible. If it only runs in a specific context like a particular programming language version or operating system or has dependencies that have to be installed manually, also add a Requirements subsection.
+### iOS — Settings App (no app upload needed)
+```bash
+python ios_getting_started.py
+```
 
-## Usage
-Use examples liberally, and show the expected output if you can. It's helpful to have inline the smallest example of usage that you can demonstrate, while providing links to more sophisticated examples if they are too long to reasonably include in the README.
+### Custom App — AWS Device Farm Reference App
+```bash
+python android_custom_app.py
+```
 
-## Support
-Tell people where they can go to for help. It can be any combination of an issue tracker, a chat room, an email address, etc.
+### Custom App — Generic Template (bring your own APK/IPA)
+```bash
+python custom_app_getting_started.py --app-path ../apps/your-app.apk \
+    --app-package com.yourcompany.app \
+    --app-activity .MainActivity
+```
 
-## Roadmap
-If you have ideas for releases in the future, it is a good idea to list them in the README.
+### Traditional Appium (comparison)
+```bash
+python android_traditional_appium.py
+```
 
-## Contributing
-State if you are open to contributions and what your requirements are for accepting them.
+## Key Learnings & Best Practices
 
-For people who want to make changes to your project, it's helpful to have some documentation on how to get started. Perhaps there is a script that they should run or some environment variables that they need to set. Make these steps explicit. These instructions could also be useful to your future self.
+| Pattern | Why |
+|---------|-----|
+| Use `type_text()` for credentials | Avoids guardrails + prevents prompt leaking |
+| Use `clear_focused()` before typing | Prevents text concatenation with existing field content |
+| One action per `act()` call | More reliable than compound instructions |
+| Tap tabs directly (don't swipe) | Portrait viewport causes swipe issues |
+| `workflow_definition_name` auth | Production-grade; logs to S3, team-shareable |
 
-You can also document commands to lint the code or run tests. These steps help to ensure high code quality and reduce the likelihood that the changes inadvertently break something. Having instructions for running tests is especially helpful if it requires external setup, such as starting a Selenium server for testing in a browser.
+## Dependencies
 
-## Authors and acknowledgment
-Show your appreciation to those who have contributed to the project.
+The `src/nova_act_mobile/` directory contains helper code vendored from
+[amazon-agi-labs/nova-act-samples](https://github.com/amazon-agi-labs/nova-act-samples)
+with import path adjustments for this project. See `src/nova_act_mobile/ATTRIBUTION.md`
+for source details, commit SHA, and modification notes.
+
+### Key Classes (from nova_act_mobile)
+
+| Class | Purpose |
+|-------|---------|
+| `NovaActMobile` | Main entry point — extends `NovaAct` with mobile support |
+| `MobileActuator` | Appium-based actuator (handles screenshots, taps, scrolls) |
+| `DeviceFarmActuator` | Provisions Device Farm remote sessions automatically |
+
+## IAM Permissions Required
+
+```json
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": [
+        "devicefarm:ListProjects",
+        "devicefarm:CreateProject",
+        "devicefarm:ListDevices",
+        "devicefarm:CreateRemoteAccessSession",
+        "devicefarm:GetRemoteAccessSession",
+        "devicefarm:StopRemoteAccessSession",
+        "devicefarm:CreateUpload",
+        "devicefarm:GetUpload",
+        "devicefarm:ListUploads"
+      ],
+      "Resource": "*"
+    }
+  ]
+}
+```
+
+## Cost
+
+- **Device Farm**: $0.17/device minute (first 1000 min free with AWS Free Tier)
+- **Nova Act**: Pay-per-step pricing (see [pricing page](https://aws.amazon.com/nova/act/pricing/))
+- **Typical getting-started run**: ~$0.50 (3 min device time + ~10 Nova Act steps)
+
+## Troubleshooting
+
+| Issue | Fix |
+|-------|-----|
+| `No devices with remote access enabled` | Ensure your account has Device Farm access in us-west-2 |
+| `NOVA_ACT_API_KEY not set` | Export your API key or use workflow definition auth |
+| `Session failed to reach RUNNING state` | Device Farm is provisioning — retry in 30s |
+| `Upload failed` | Check your APK/IPA is valid and not corrupted |
+
+## Next Steps
+
+- **QA assertions**: See `examples/qa/mobile_qa/` in `nova-act-samples` for `nova.check()` and `nova.expect()`
+- **Deep links**: Launch apps at specific screens with `deep_link="myapp://screen"`
+- **Permissions**: Pre-grant Android permissions to suppress dialogs
+- **CI/CD deployment**: See `cdk/` in `nova-act-samples` for Lambda/ECS deployment
+
+## References
+
+- [Amazon Nova Act Documentation](https://docs.aws.amazon.com/nova-act/)
+- [AWS Device Farm Documentation](https://docs.aws.amazon.com/devicefarm/)
+- [nova-act-samples (full repo)](https://github.com/amazon-agi-labs/nova-act-samples)
+- [Mobile Actuation README](https://github.com/amazon-agi-labs/nova-act-samples/tree/main/examples/actuation/mobile)
 
 ## License
-For open source projects, say how it is licensed.
 
-## Project status
-If you have run out of energy or time for your project, put a note at the top of the README saying that development has slowed down or stopped completely. Someone may choose to fork your project or volunteer to step in as a maintainer or owner, allowing your project to keep going. You can also make an explicit request for maintainers.
+MIT-0

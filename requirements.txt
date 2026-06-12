@@ -1,0 +1,24 @@
+# Nova Act + Device Farm Getting Started - Dependencies
+
+# Nova Act SDK
+nova-act>=0.1.0
+
+# AWS SDK
+boto3>=1.34.0
+
+# Environment configuration
+python-dotenv>=1.0.0
+
+# Appium client
+Appium-Python-Client>=4.0.0
+
+# Selenium (Appium dependency)
+selenium>=4.20.0
+
+# Other dependencies used by nova_act_mobile
+Pillow>=10.0.0
+pydantic>=2.0.0
+requests>=2.31.0
+
+# Type stubs (optional, for IDE support)
+# mypy-boto3-devicefarm>=1.34.0
