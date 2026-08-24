@@ -37,6 +37,13 @@ load_dotenv(os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file_
 
 DEFAULT_DEVICE_ARN = os.environ["DEVICE_FARM_DEVICE_ARN"]
 
+# Screenshots dir (relative to project root, resolved from this file — works
+# regardless of the current working directory)
+SCREENSHOTS_DIR = os.path.join(
+    os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "screenshots"
+)
+os.makedirs(SCREENSHOTS_DIR, exist_ok=True)
+
 
 # --- Device Farm Session Setup (manual) ---
 # In traditional Appium, YOU manage the entire Device Farm lifecycle.
